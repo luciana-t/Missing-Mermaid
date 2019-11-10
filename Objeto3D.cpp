@@ -5,11 +5,12 @@
 #include <GL/glut.h>
 #include <array>
 #include <iostream>
-#include <cmath> 
+#include <cmath>
 
-//PROXIMA COISA: CRIAR MAIS UM ARQUIVO COM AS FUNCOES PARA MOVER (USARAO AS FUNCOES DO TECLADO QUE ESTAO EM FUNC.H)
 
-#include "func.h"
+GLint g_window_width, g_window_height;
+GLdouble g_ratio;
+GLint g_near = 1, g_far = 10000;
 
 using namespace std;
 
@@ -22,7 +23,6 @@ struct Objeto3D {
 	Objeto3D() {
 		velocidade = 0;
 		deslocamento = rotacao = { 0,0,0 };
-        speed_rotate = 0;
 	}
 
 	vector<Face> faces;
@@ -31,7 +31,6 @@ struct Objeto3D {
     array<GLfloat, 3> rotacao;
     array<GLfloat, 3> deslocamento;
     GLfloat velocidade;
-    GLint speed_rotate;
     
 
     //posiciona o ponto medio do objeto em 0,0,0
@@ -92,9 +91,45 @@ void parseObject(Objeto3D &o, const string &file){
 
     ifstream fin(file.c_str());
     string temp;
+    Point ponto;
+    Face face;
 
     o = Objeto3D();
-// MEU CUBO PARA TESTAR AS COISAS DO JOGO!! COMENTE DAQUI...
+
+    while(fin >> temp){
+        if(temp == "v"){ //linha vértice
+            fin >> ponto[0] >> ponto[1] >> ponto[2];
+            o.vertices.push_back(ponto);
+        } else if(temp == "f"){
+            string linha;
+            getline(fin, linha);
+
+            stringstream sslinha(linha);
+
+            if(linha.find("/") == string::npos){
+                sslinha >> face[0] >> face[1] >> face[2];
+                o.faces.push_back(face);
+            } else {
+                int ignInt, f0, f1, f2;
+                char ignBarra;
+
+                sslinha >> f0 >> ignBarra >> ignInt >> ignBarra >> ignInt;
+                sslinha >> f1 >> ignBarra >> ignInt >> ignBarra >> ignInt;
+                sslinha >> f2 >> ignBarra >> ignInt >> ignBarra >> ignInt;
+
+                f0--;
+                f1--;
+                f2--;
+
+                o.faces.push_back({f0,f1,f2});
+            }
+
+        }
+    }
+
+
+/*
+// MEU CUBO PARA TESTAR AS COISAS DO JOGO!! COMENTE DAQUI... 
     o.vertices = {
         { 0.0,  0.0,  0.0},
         { 0.0,  0.0,  1.0},
@@ -119,8 +154,9 @@ void parseObject(Objeto3D &o, const string &file){
         { 0,  5,  1},
         { 1,  5,  7},
         { 1,  7,  3}
-    };
+    }; 
 //                          ..ATÉ AQUI
+*/
     
 
     /*
@@ -162,28 +198,30 @@ void parseObject(Objeto3D &o, const string &file){
         }
     }
 */
+
+
 }
 
 vector<Objeto3D> g_objetos;
 Objeto3D g_submarino;
 
 
-void load(){
+void carregaObjetos(){
 
-	vector<string> file_names = {"dog.obj", "dog.obj", "dog.obj"};
+	//vector<string> file_names = {"dog.obj", "dog.obj", "dog.obj"};
 	
-	parseObject(g_submarino, "dog.obj");
+	parseObject(g_submarino, "submarino4.obj");
 
     g_submarino.transladaOrigem();
     g_submarino.translada(0,0,-2);
 
-	g_objetos.resize(file_names.size());
+	//g_objetos.resize(file_names.size());
 
-	for(size_t i=0; i < file_names.size(); i++){
+	//for(size_t i=0; i < file_names.size(); i++){
 
-		parseObject(g_objetos[i], file_names[i]);
-        g_objetos[i].transladaOrigem();
-    }
+	//	parseObject(g_objetos[i], file_names[i]);
+    //    g_objetos[i].transladaOrigem();
+    //}
 }
 
 GLvoid init(){
@@ -221,16 +259,10 @@ GLvoid display(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    //g_submarino.rotaciona(0, rot, 0);
-    //rot += 0.0001f; //GIRANDO O CUBO
-
-
-    //g_submarino.move();
+    g_submarino.rotaciona(0, rot, 0);
+    rot += 0.0001f;
     g_submarino.draw();
-
-    func_keyboard();
-
-/* TRIANGULO PARA TESTE
+/*
     glBegin(GL_TRIANGLES);
     glVertex3f(-0.5, -0.5, -10.0); glColor3f(1, 0, 0);
     glVertex3f(0.5, -0.5, -10.0); glColor3f(0, 1, 0);
@@ -254,23 +286,25 @@ int main(GLint argc, GLchar **argv) {
 	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-window_width)/2,(glutGet(GLUT_SCREEN_HEIGHT)-window_height)/2); //centralizar janela
 	glutCreateWindow("Trabalho 2");
 
-	load();
+	carregaObjetos();
 
-    init(); 
-    glutDisplayFunc(display); 
-	glutSpecialFunc(keyboard_espec); 
-	glutKeyboardFunc(keyboard); 
-    glutKeyboardUpFunc(keyDown); 
-	glutSpecialUpFunc(keyUp); 
-
-	//glutTimerFunc(menu_update_delay,update,1); // talvez nao seja preciso
-
+    init(); // ainda nao foi feita
+    glutDisplayFunc(display); // ainda nao foi feita
+	/*glutSpecialFunc(keyboard_espec); // ainda nao foi feita
+	glutKeyboardFunc(keyboard); // ainda nao foi feita
+	glutTimerFunc(menu_update_delay,update,1); // ainda nao foi feita 
+	*/
 
     glutReshapeFunc(reshape);
 
+	/*glutMouseFunc(mouseClick); // ainda nao foi feita
+	glutSpecialUpFunc(keyUp); // ainda nao foi feita
 
+    glutMotionFunc(mouseMove); // ainda nao foi feita
+    glutPassiveMotionFunc(mouseMovePassivo); // ainda nao foi feita
+    glutKeyboardUpFunc(keyDown); // ainda nao foi feita
 */
-    glutIdleFunc(idle); 
+    glutIdleFunc(idle); // ainda nao foi feita
     
     glutMainLoop();
 
