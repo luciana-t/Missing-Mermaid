@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath> 
 
+//PROXIMA COISA: CRIAR MAIS UM ARQUIVO COM AS FUNCOES PARA MOVER (USARAO AS FUNCOES DO TECLADO QUE ESTAO EM FUNC.H)
 
 #include "func.h"
 
@@ -21,6 +22,7 @@ struct Objeto3D {
 	Objeto3D() {
 		velocidade = 0;
 		deslocamento = rotacao = { 0,0,0 };
+        speed_rotate = 0;
 	}
 
 	vector<Face> faces;
@@ -29,6 +31,7 @@ struct Objeto3D {
     array<GLfloat, 3> rotacao;
     array<GLfloat, 3> deslocamento;
     GLfloat velocidade;
+    GLint speed_rotate;
     
 
     //posiciona o ponto medio do objeto em 0,0,0
@@ -221,6 +224,8 @@ GLvoid display(){
     //g_submarino.rotaciona(0, rot, 0);
     //rot += 0.0001f; //GIRANDO O CUBO
 
+
+    //g_submarino.move();
     g_submarino.draw();
 
     func_keyboard();
@@ -253,19 +258,17 @@ int main(GLint argc, GLchar **argv) {
 
     init(); 
     glutDisplayFunc(display); 
-	/*glutSpecialFunc(keyboard_espec); // ainda nao foi feita
-	glutKeyboardFunc(keyboard); // ainda nao foi feita
-	glutTimerFunc(menu_update_delay,update,1); // ainda nao foi feita 
-	*/
+	glutSpecialFunc(keyboard_espec); 
+	glutKeyboardFunc(keyboard); 
+    glutKeyboardUpFunc(keyDown); 
+	glutSpecialUpFunc(keyUp); 
+
+	//glutTimerFunc(menu_update_delay,update,1); // talvez nao seja preciso
+
 
     glutReshapeFunc(reshape);
 
-	/*glutMouseFunc(mouseClick); // ainda nao foi feita
-	glutSpecialUpFunc(keyUp); // ainda nao foi feita
 
-    glutMotionFunc(mouseMove); // ainda nao foi feita
-    glutPassiveMotionFunc(mouseMovePassivo); // ainda nao foi feita
-    glutKeyboardUpFunc(keyDown); // ainda nao foi feita
 */
     glutIdleFunc(idle); 
     
