@@ -91,9 +91,24 @@ void parseObject(Objeto3D &o, const string &file){
 
     ifstream fin(file.c_str());
     string temp;
+    Point ponto;
+    Face face;
 
     o = Objeto3D();
-// MEU CUBO PARA TESTAR AS COISAS DO JOGO!! COMENTE DAQUI...
+
+    while(fin >> temp){
+        if(temp == "v"){ //linha vértice
+            fin >> ponto[0] >> ponto[1] >> ponto[2];
+            o.vertices.push_back(ponto);
+        } else if(temp == "f"){
+            fin >> face[0] >> face[1] >> face[2];
+            o.faces.push_back(face);
+        }
+    }
+
+
+/*
+// MEU CUBO PARA TESTAR AS COISAS DO JOGO!! COMENTE DAQUI... 
     o.vertices = {
         { 0.0,  0.0,  0.0},
         { 0.0,  0.0,  1.0},
@@ -118,8 +133,9 @@ void parseObject(Objeto3D &o, const string &file){
         { 0,  5,  1},
         { 1,  5,  7},
         { 1,  7,  3}
-    };
+    }; 
 //                          ..ATÉ AQUI
+*/
     
 
     /*
@@ -161,6 +177,8 @@ void parseObject(Objeto3D &o, const string &file){
         }
     }
 */
+
+
 }
 
 vector<Objeto3D> g_objetos;
@@ -169,20 +187,20 @@ Objeto3D g_submarino;
 
 void carregaObjetos(){
 
-	vector<string> file_names = {"dog.obj", "dog.obj", "dog.obj"};
+	//vector<string> file_names = {"dog.obj", "dog.obj", "dog.obj"};
 	
-	parseObject(g_submarino, "dog.obj");
+	parseObject(g_submarino, "cubo.obj");
 
     g_submarino.transladaOrigem();
     g_submarino.translada(0,0,-2);
 
-	g_objetos.resize(file_names.size());
+	//g_objetos.resize(file_names.size());
 
-	for(size_t i=0; i < file_names.size(); i++){
+	//for(size_t i=0; i < file_names.size(); i++){
 
-		parseObject(g_objetos[i], file_names[i]);
-        g_objetos[i].transladaOrigem();
-    }
+	//	parseObject(g_objetos[i], file_names[i]);
+    //    g_objetos[i].transladaOrigem();
+    //}
 }
 
 GLvoid init(){
